@@ -1,45 +1,150 @@
 "use client";
 
 import { useUser } from "../context/UserContext";
-import { Box, Button, FormControl, FormLabel, Input, Textarea, Select, VStack, Text, Center } from "@chakra-ui/react";
+import { useState } from "react";
+import { Box, Button, FormControl, Select, VStack, Text, Center } from "@chakra-ui/react";
+import { fetchDevices, Device } from "../api/fetchDevices"; 
+import { useRouter } from 'next/navigation';
 
 export default function SelectPage() {
-  const { userName } = useUser(); // ログインユーザー名を取得する
+  const { userName } = useUser(); 
+  const [symptomsId, setSymptomsId] = useState("");
+  const [effectId, setEffectId] = useState("");
+  const [area, setArea] = useState("");
+  const [devices, setDevices] = useState<Device[]>([]); 
+  const router = useRouter();
+
+  const handleSearchDevices = async () => {
+    const data = await fetchDevices(area, effectId, symptomsId);
+    if (data) {
+      setDevices(data);
+      const queryString = new URLSearchParams({ 
+        devices: JSON.stringify(data)
+      }).toString();
+      router.push(`/page3?${queryString}`);
+    } else {
+      console.error("No devices found");
+    }
+  };
 
   return (
-    <Center height="100vh" backgroundColor="#f8f8f8">
-      <Box
-        background="white"
-        padding="8"
-        borderRadius="md"
-        boxShadow="lg"
-        width="320px"
+    <Center height="100vh" bg="#f8f8f8">
+      <Box 
+        background="white" 
+        padding="18" 
+        borderRadius="3xl" 
+        boxShadow="2xl" 
+        width="400px" 
         textAlign="center"
+        borderWidth="1px"
+        borderColor="#E5E5E5"
+        transition="transform 0.3s ease-in-out"
+        _hover={{ transform: "scale(1.03)", boxShadow: "3xl" }}
       >
-        <Text fontSize="lg" color="red.500" mb="4">
-          {userName}さんが今抱えている問題は何ですか？
+        <Text 
+          fontSize="xl" 
+          color="#333" 
+          mb="20"
+          lineHeight="1.8"
+          fontFamily="sans-serif"
+          letterSpacing="wide"
+        >
+          <Text as="span" color="#E4626E" fontWeight="bold">
+            {userName}さん、
+          </Text>
+          身体の不調は何ですか？
         </Text>
-        <VStack spacing="4">
+        <VStack spacing="10">
           <FormControl>
-            <Input type="text" placeholder="身体がだるい" />
-          </FormControl>
-          <FormControl>
-            <FormLabel fontWeight="bold" color="gray.600">どのような効果を求めますか？</FormLabel>
-            <Textarea placeholder="身体を温めたい" />
-          </FormControl>
-          <FormControl>
-            <FormLabel fontWeight="bold" color="gray.600">Location</FormLabel>
-            <Select placeholder="渋谷区">
-              <option value="shibuya">渋谷区</option>
-              <option value="shinjuku">新宿区</option>
-              <option value="minato">港区</option>
+            <Select 
+              value={symptomsId} 
+              onChange={(e) => setSymptomsId(e.target.value)} 
+              placeholder="どのような症状ですか？　"
+              size="lg"
+              borderRadius="full"
+              bg="#F7F7F7"
+              focusBorderColor="#E4626E"
+              height="50px"
+              _focus={{ boxShadow: "outline" }}
+              css={{
+                '-webkit-appearance': 'none',
+                '-moz-appearance': 'none',
+                'appearance': 'none',
+                'paddingRight': '2rem',
+              }}
+            >
+              <option value="1">症状1</option>
+              <option value="2">症状2</option>
+              <option value="3">症状3</option>
+              <option value="4">症状4</option>
             </Select>
           </FormControl>
-          <Button colorScheme="red" width="100%" mt={4}>
+          <FormControl>
+            <Select 
+              value={effectId} 
+              onChange={(e) => setEffectId(e.target.value)} 
+              placeholder="どんな効果を求めますか？"
+              size="lg"
+              borderRadius="full"
+              bg="#F7F7F7"
+              focusBorderColor="#E4626E"
+              height="50px"
+              _focus={{ boxShadow: "outline" }}
+              css={{
+                '-webkit-appearance': 'none',
+                '-moz-appearance': 'none',
+                'appearance': 'none',
+                'paddingRight': '2rem',
+              }}
+            >
+              <option value="1">効果1</option>
+              <option value="2">効果2</option>
+              <option value="3">効果3</option>
+              <option value="4">効果4</option>
+            </Select>
+          </FormControl>
+          <FormControl>
+            <Select 
+              value={area} 
+              onChange={(e) => setArea(e.target.value)} 
+              placeholder="地域（location）　　　"
+              size="lg"
+              borderRadius="full"
+              bg="#F7F7F7"
+              focusBorderColor="#E4626E"
+              height="50px"
+              _focus={{ boxShadow: "outline" }}
+              css={{
+                '-webkit-appearance': 'none',
+                '-moz-appearance': 'none',
+                'appearance': 'none',
+                'paddingRight': '2rem',
+              }}
+            >
+              <option value="渋谷区">渋谷区</option>
+              <option value="新宿区">新宿区</option>
+              <option value="港区">港区</option>
+              <option value="世田谷区">世田谷区</option>
+            </Select>
+          </FormControl>
+          <Button 
+            colorScheme="red" 
+            backgroundColor="#E4626E" 
+            borderRadius="full" 
+            width="100%" 
+            height="50px" 
+            mt={10} 
+            _hover={{ backgroundColor: "#D4515A" }}
+            onClick={handleSearchDevices}
+            boxShadow="xl"
+            transition="background-color 0.3s ease"
+          >
             治療器選択
           </Button>
         </VStack>
       </Box>
     </Center>
   );
+  
+  
 }

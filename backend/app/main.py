@@ -35,7 +35,7 @@ def login(user_id: str = Body(...), password: str = Body(...), db: Session = Dep
         raise HTTPException(status_code=404, detail="User not found")
 
 @app.get("/search_devices", response_model=List[schemas.Device])
-def search_devices(symptoms_id: int, effect_id: int, area: str, db: Session = Depends(get_db)):
+def search_devices(symptoms_id: int, effect_id: int, area: Optional[str] = None, db: Session = Depends(get_db)):
     query = db.query(
         models.ClinicDevice.device_id,
         models.ClinicDevice.clinic_id,
@@ -50,8 +50,10 @@ def search_devices(symptoms_id: int, effect_id: int, area: str, db: Session = De
     ).filter(
         models.DeviceMaster.effect_id == effect_id,
         models.DeviceMaster.symptoms_id == symptoms_id,
-        models.ClinicMaster.area == area
     )
+
+    if area:
+        query = query.filter(models.ClinicMaster.area == area)
 
     results = query.all()
     if not results:
