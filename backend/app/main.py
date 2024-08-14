@@ -4,6 +4,10 @@ from typing import List, Optional
 from .database import SessionLocal, engine
 from . import models, schemas
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
+from .schemas import Device
+
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -60,3 +64,38 @@ def search_devices(symptoms_id: int, effect_id: int, area: Optional[str] = None,
         raise HTTPException(status_code=404, detail="Devices not found")
 
     return results
+
+@app.post("/reserve_device")
+def reserve_device(
+    reservation: schemas.ReservationCreate,  # Pydanticモデルとしてデータを受け取る
+    db: Session = Depends(get_db)
+):
+    reservation_data = models.ReservationRecord(
+        user_id=reservation.user_id,
+        clinic_id=reservation.clinic_id,
+        device_id=reservation.device_id,
+        reservation_date=datetime.strptime(reservation.reservation_date, "%Y-%m-%d"),
+        start_time=datetime.strptime(reservation.start_time, "%H:%M"),
+        end_time=datetime.strptime(reservation.end_time, "%H:%M"),
+        price=reservation.price
+    )
+    db.add(reservation_data)
+    db.commit()
+    db.refresh(reservation_data)
+    return {"reservation_id": reservation_data.reservation_id}
+
+
+@app.get("/get_device_by_tel", response_model=schemas.Device)
+def get_device_by_tel(tel: str, db: Session = Depends(get_db)):
+    device = db.query(models.Device).filter(models.Device.tel == tel).first()
+    if device is None:
+        raise HTTPException(status_code=404, detail="Device not found")
+    return device
+
+
+@app.get("/get_reservation_details", response_model=schemas.ReservationDetails)
+def get_reservation_details(reservation_id: int, db: Session = Depends(get_db)):
+    reservation = db.query(models.ReservationRecord).filter(models.ReservationRecord.reservation_id == reservation_id).first()
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    return reservation

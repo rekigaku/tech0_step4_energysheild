@@ -28,4 +28,41 @@ export type Device = {
       return null;
     }
   }
+
+  export async function reserveDevice(
+    userId: number,
+    clinicId: number,
+    deviceId: number,
+    reservationDate: string,
+    startTime: string,
+    endTime: string,
+    price: number
+  ): Promise<{ reservation_id: number } | null> {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/reserve_device', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          clinic_id: clinicId,
+          device_id: deviceId,
+          reservation_date: reservationDate,
+          start_time: startTime,
+          end_time: endTime,
+          price: price,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to reserve device");
+      }
+  
+      return await response.json();
+    } catch (error) {
+      console.error("Error reserving device:", error);
+      return null;
+    }
+  }
   

@@ -49,3 +49,27 @@ class DeviceMaster(Base):
     symptoms_id = Column(Integer, ForeignKey('symptoms.symptom_id'))
     effect_id = Column(Integer, ForeignKey('effects.effect_id'))
     picture_code = Column(String)
+
+class ReservationRecord(Base):
+    __tablename__ = 'reservation_records'
+
+    reservation_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('user_master.user_id'))
+    clinic_id = Column(Integer, ForeignKey('clinic_master.clinic_id'))
+    device_id = Column(Integer, ForeignKey('clinic_device.device_id'))
+    reservation_date = Column(String)
+    start_time = Column(String)
+    end_time = Column(String)
+    price = Column(Float)
+
+class Device(Base):
+    __tablename__ = 'devices'
+    
+    device_id = Column(Integer, primary_key=True, index=True)
+    clinic_id = Column(Integer, ForeignKey('clinic_master.clinic_id'))
+    device_name = Column(String)
+    description = Column(String)
+    price = Column(Float)
+    duration = Column(String)
+    address = Column(String)
+    tel = Column(String, unique=True)
