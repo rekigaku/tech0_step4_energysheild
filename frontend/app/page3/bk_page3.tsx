@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Box, Text, Center, SimpleGrid, Button } from "@chakra-ui/react";
-import { useUser } from "../context/UserContext";  // userNameを取得するためにインポート
+
 
 type Device = {
   device_id: number;
@@ -18,7 +18,6 @@ type Device = {
 
 export default function ResultPage() {
   const searchParams = useSearchParams();
-  const { userName } = useUser();  // userNameを取得
   const devices: Device[] = JSON.parse(searchParams.get('devices') || '[]');
   const [selectedDeviceTel, setSelectedDeviceTel] = useState<string | null>(null);
   const router = useRouter();
@@ -30,10 +29,11 @@ export default function ResultPage() {
   const handleSubmit = async () => {
     const selectedDevice = devices.find(device => device.tel === selectedDeviceTel);
     if (selectedDevice) {
-      // デバイス情報全体をクエリパラメータとして渡して page4 にリダイレクト
-      router.push(`/page4?device=${encodeURIComponent(JSON.stringify(selectedDevice))}`);
+      // クエリパラメータとして必要な情報を渡して page4 にリダイレクト
+      router.push(`/page4?tel=${encodeURIComponent(selectedDevice.tel)}&duration=${selectedDevice.duration}&price=${selectedDevice.price}`);
     }
   };
+
 
   return (
     <Center minHeight="100vh" backgroundColor="#f8f8f8" py={10}>
@@ -45,12 +45,12 @@ export default function ResultPage() {
         width={["90%", "80%", "60%"]}
         maxWidth="600px"
         textAlign="center"
-        borderColor="#E4626E"
+        borderColor="#E4626E" // 全体の枠線をイメージ図に合わせて調整
         borderWidth="1px"
         borderStyle="solid"
       >
         <Text fontSize="lg" fontWeight="bold" mb={4} color="#E4626E">
-          {userName}さん {/* userNameを表示 */}
+        {userName} {/* ユーザー名を表示 */}
         </Text>
         <Text fontSize="sm" color="gray.500" mb={6}>
           あなたにおススメの治療器
@@ -68,7 +68,7 @@ export default function ResultPage() {
                 cursor="pointer"
                 transition="all 0.3s"
                 _hover={{ boxShadow: "md", transform: "scale(1.02)" }}
-                bg={selectedDeviceTel === device.tel ? "#fff6e6" : "white"}
+                bg={selectedDeviceTel === device.tel ? "#fff6e6" : "white"} // 選択された項目の背景色を設定
               >
                 <Text fontSize="xl" fontWeight="bold" mb={2}>{device.device_name}</Text>
                 <Text fontSize="md" mb={2}>{device.description}</Text>

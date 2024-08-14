@@ -10,13 +10,36 @@ const ReservationPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const device = JSON.parse(searchParams.get('device') || '{}');
-  const duration = parseInt(device.duration || '60');
-  const price = parseFloat(device.price || '0');
+  const tel = searchParams.get('tel');
+  const duration = parseInt(searchParams.get('duration') || '60');
+  const price = parseFloat(searchParams.get('price') || '0');
 
+  const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [startTime, setStartTime] = useState<string>('09:00');
   const [calculatedPrice, setCalculatedPrice] = useState<number>(price);
+
+  useEffect(() => {
+    if (tel) {
+      fetch(`http://127.0.0.1:8000/get_device_by_tel?tel=${tel}`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Fetched device data:", data); // データの構造を確認
+          if (data) {
+            console.log("Device ID:", data.device_id); // デバイスIDを確認
+            console.log("Clinic ID:", data.clinic_id); // クリニックIDを確認
+            setSelectedDevice(data);
+            setCalculatedPrice(price);
+          } else {
+            console.error('デバイスが見つかりませんでした。');
+          }
+        })
+        .catch(error => {
+          console.error('デバイス情報の取得に失敗しました', error);
+        });
+    }
+  }, [tel, price]);
+  
 
   const timeOptions = Array.from({ length: 22 }, (_, i) => {
     const hour = 9 + Math.floor(i / 2);
@@ -35,11 +58,11 @@ const ReservationPage = () => {
   const endTime = calculateEndTime(startTime, duration);
 
   const handleSubmit = async () => {
-    if (device && date) {
+    if (selectedDevice && date) {
         const requestData = {
             user_id: 1,
-            clinic_id: device.clinic_id,
-            device_id: device.device_id,
+            clinic_id: selectedDevice.clinic_id,
+            device_id: selectedDevice.device_id,
             reservation_date: date.toISOString().split('T')[0],
             start_time: startTime,
             end_time: endTime,
@@ -90,7 +113,7 @@ const ReservationPage = () => {
         
         <Divider my={6} />
 
-        {device ? (
+        {selectedDevice ? (
           <VStack spacing={5} align="stretch">
             <Flex justify="space-between" align="center">
               <Text color="#333" fontWeight="bold">開始時間</Text>
@@ -123,7 +146,7 @@ const ReservationPage = () => {
               py={6} 
               mt={4} 
               borderRadius="md"
-              _hover={{ bg: "#D0505F" }}
+              _hover={{ bg: "#D0505F" }} // Hover時の背景色
               onClick={handleSubmit}
             >
               予約する
