@@ -73,10 +73,12 @@ export default function SelectPage() {
                 'paddingRight': '2rem',
               }}
             >
-              <option value="1">症状1</option>
-              <option value="2">症状2</option>
-              <option value="3">症状3</option>
-              <option value="4">症状4</option>
+              <option value="1">頭痛</option>
+              <option value="2">ストレス</option>
+              <option value="3">肩こり</option>
+              <option value="4">冷え</option>
+              <option value="5">座骨神経痛</option>
+              <option value="6">手の痺れ</option>
             </Select>
           </FormControl>
           <FormControl>
@@ -97,10 +99,11 @@ export default function SelectPage() {
                 'paddingRight': '2rem',
               }}
             >
-              <option value="1">効果1</option>
-              <option value="2">効果2</option>
-              <option value="3">効果3</option>
-              <option value="4">効果4</option>
+              <option value="1">血行促進</option>
+              <option value="2">緊張緩和</option>
+              <option value="3">痛み緩和</option>
+              <option value="4">疲労回復</option>
+              <option value="5">自律神経調整</option>
             </Select>
           </FormControl>
           <FormControl>
@@ -129,7 +132,9 @@ export default function SelectPage() {
           </FormControl>
           <Button 
             colorScheme="red" 
-            backgroundColor="#E4626E" 
+            backgroundColor="#E4626E"
+            // backgroundColor="#C53030" 
+            color="white"
             borderRadius="full" 
             width="100%" 
             height="50px" 

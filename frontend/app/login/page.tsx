@@ -88,7 +88,8 @@ export default function Login() {
             </FormControl>
             <Button
               type="submit"
-              backgroundColor="#E53E3E"
+              backgroundColor="#E4626E"
+              // backgroundColor="#E53E3E"
               color="white"
               width="100%"
               height="45px"

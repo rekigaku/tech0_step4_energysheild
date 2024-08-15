@@ -62,15 +62,26 @@ const ReservationPage = () => {
             const result = await response.json();
             const reservationId = result.reservation_id;
 
-            // 次のページ（page5）に reservation_id を渡す
-            router.push(`/page5?reservation_id=${reservationId}`);
+            // 次のページ（page5）に必要な情報を渡す
+            const queryParams = new URLSearchParams({
+                reservation_id: reservationId.toString(),
+                address: device.address,
+                tel: device.tel,
+                reservation_date: requestData.reservation_date,
+                start_time: requestData.start_time,
+                end_time: requestData.end_time,
+                price: requestData.price.toString(),
+                duration: duration.toString(),
+            });
 
+            router.push(`/page5?${queryParams.toString()}`);
         } catch (error) {
             console.error('予約処理でエラーが発生しました:', error);
             alert('予約に失敗しました。もう一度お試しください。');
         }
     }
 };
+
 
   return (
     <Center height="100vh" bg="#f8f8f8">
@@ -113,6 +124,14 @@ const ReservationPage = () => {
             <Flex justify="space-between" align="center">
               <Text color="#333" fontWeight="bold">利用料金</Text>
               <Text color="#E4626E" fontWeight="bold" borderWidth="1px" borderColor="gray.300" borderRadius="md" p={2}>¥{calculatedPrice}</Text>
+            </Flex>
+            <Flex justify="space-between" align="center">
+              <Text color="#333" fontWeight="bold">住所</Text>
+              <Text color="gray.600">{device.address}</Text>
+            </Flex>
+            <Flex justify="space-between" align="center">
+              <Text color="#333" fontWeight="bold">電話番号</Text>
+              <Text color="gray.600">{device.tel}</Text>
             </Flex>
             <Button 
               bg="#E4626E" 
